@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Final Settlement</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+        .container { max-width: 600px; margin: auto; }
+        .result { font-size: 2em; font-weight: bold; }
+        .pass { color: green; }
+        .fail { color: red; }
+        .flavor-text { margin-top: 20px; font-style: italic; color: #555; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Thesis Defense Result</h1>
+        {% if result_data %}
+            <div class="result {{ result_data.result|lower }}">
+                {{ result_data.result }}
+            </div>
+            <p>Pass Probability: {{ result_data.pass_probability|floatformat:2 }}</p>
+            {% if result_data.flavor_text %}
+                <div class="flavor-text">
+                    "{{ result_data.flavor_text }}"
+                </div>
+            {% endif %}
+        {% else %}
+            <p>No settlement data available.</p>
+        {% endif %}
+        <br>
+        <a href="{% url 'init_game' %}">Play Again</a>
+    </div>
+</body>
+</html>
+

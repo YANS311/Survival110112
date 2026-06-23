@@ -1,0 +1,48 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-danger">🎮 消费与解压</h2>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">返回控制台</a>
+    </div>
+
+    <div class="alert alert-dark border-secondary d-flex justify-content-between">
+        <span>当前余额：<strong class="text-success">￥{{ player.money }}</strong></span>
+        <span>已收纳纪念品：<strong class="text-info">{{ player.souvenir_count }} 件</strong></span>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4 class="text-light mb-3">☕ 日常解压</h4>
+            {% for key, item in activities.items %}
+            <div class="card bg-dark border-secondary mb-3">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="text-white mb-1">{{ item.name }}</h5>
+                        <small class="text-muted">HP +{{ item.hp_gain|default:0 }}</small>
+                    </div>
+                    <a href="{% url 'take_leisure' key %}" class="btn btn-outline-danger">￥{{ item.money_cost }}</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-6">
+            <h4 class="text-info mb-3"><i class="bi bi-display"></i> 纪念品/硬件</h4>
+            {% for key, item in souvenirs.items %}
+            <div class="card bg-dark border-info mb-3 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5 class="text-info mb-0">{{ item.name }}</h5>
+                        <span class="text-success fw-bold">￥{{ item.money_cost }}</span>
+                    </div>
+                    <p class="text-muted small mb-3">{{ item.desc }}</p>
+                    <a href="{% url 'take_leisure' key %}" class="btn btn-sm btn-info w-100">确认购入</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

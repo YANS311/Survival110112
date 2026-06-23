@@ -1,0 +1,50 @@
+{% extends 'game/base.html' %}
+
+{% block title %}致谢环节{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-warning text-dark">
+            <h2 class="mb-0">致谢环节</h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <h4>论文进度：{{ player.thesis_progress|floatformat:1 }}%</h4>
+                <h4>当前SAN值：{{ player.san|floatformat:1 }}</h4>
+                <p class="lead">你已经接近完成论文，但SAN值极低。是时候写致谢了！</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5>真情流露（写致谢）</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>消耗 ￥2,000 请同门吃饭，瞬间回复 20 点 SAN 值。</p>
+                            <p>余额：￥{{ player.money|floatformat:0 }}</p>
+                            {% if player.money >= 2000 %}
+                                <a href="{% url 'thank_you_action' %}" class="btn btn-success btn-lg">确认写致谢</a>
+                            {% else %}
+                                <button class="btn btn-secondary btn-lg" disabled>余额不足</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-secondary text-white">
+                            <h5>继续硬撑</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>不写致谢，继续坚持。SAN值将继续下降。</p>
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg">继续工作</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

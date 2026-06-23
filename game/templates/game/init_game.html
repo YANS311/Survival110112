@@ -1,0 +1,164 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-3 fw-bold text-danger" style="letter-spacing: 10px; text-shadow: 0 0 20px rgba(255,0,0,0.5);">
+        SURVIVAL 110112
+    </h1>
+    <p class="text-muted">北京研究生生存模拟器 v2026.03</p>
+</div>
+
+<div class="card border-danger mb-4 shadow-lg animate__animated animate__fadeIn">
+    <div class="card-header bg-danger text-white fw-bold">
+        📢 实时简讯：2026 专硕生存现状
+    </div>
+    <div class="card-body bg-dark text-light p-4">
+        <h4 class="text-warning mb-3">《不提供住宿的专硕生，困于高房租》</h4>
+        <blockquote class="blockquote" style="font-size: 0.95rem; border-left: 4px solid #ff4d4d; padding-left: 15px;">
+            <p>“中关村的一张床位要 3000 元，五道口的隔断间已经涨到了 5500 元。”</p>
+            <p>随着多所高校明确专硕生不再提供宿舍，北漂求学的成本正在急速飙升。有人为了省钱住在燕郊，每天往返通勤四小时；有人在自习室睡到半夜，再偷偷潜回出租屋...</p>
+            <footer class="blockquote-footer text-muted">摘自《腾讯新闻·深网》专题报道</footer>
+        </blockquote>
+        
+        <hr class="border-secondary my-4">
+        
+        <h5 class="text-info mb-3">📊 2026年北京租房市场数据</h5>
+        <div class="row text-center mb-3">
+            <div class="col-4">
+                <div class="border border-danger rounded p-2">
+                    <div class="text-danger fw-bold fs-4">¥5,000</div>
+                    <small class="text-muted">海淀核心区月租</small>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="border border-warning rounded p-2">
+                    <div class="text-warning fw-bold fs-4">¥1,000</div>
+                    <small class="text-muted">燕郊最低月租</small>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="border border-info rounded p-2">
+                    <div class="text-info fw-bold fs-4">4小时</div>
+                    <small class="text-muted">跨省通勤时间</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert alert-secondary bg-transparent border-secondary mt-3">
+            <p class="mb-2"><strong>📰 近期热点事件：</strong></p>
+            <ul class="mb-0 small">
+                <li>🔥 多校宣布2026级专硕不提供宿舍，引发学生群体抗议</li>
+                <li>💰 AI算力成本暴涨，GPT-5.4 API价格较去年上涨300%</li>
+                <li>🚇 地铁18号线段开通，昌平线压力稍有缓解</li>
+                <li>📈 北京房租同比上涨15%，学区房涨幅达25%</li>
+                <li>⚠️ 多名研究生因长期高压出现心理问题，校方加强心理干预</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning border-warning bg-dark mb-4">
+    <h5 class="alert-heading">⚠️ 投胎警告 (Risk Warning)</h5>
+    <ul class="mb-0" style="font-size: 0.85rem;">
+        <li>本系统数值严格参考 2026 年北京真实租赁市场。</li>
+        <li><strong>SAN 值（理智）</strong>归零将导致你前往三河大神结局。</li>
+        <li><strong>AI 订阅</strong>是高额的固定开销，但那是你论文进度的唯一保证。</li>
+    </ul>
+</div>
+
+<div class="card border-secondary mb-4">
+    <div class="card-header bg-secondary text-white fw-bold">
+        🗺️ 北京主要城区概览 (可选租房区域)
+    </div>
+    <div class="card-body bg-dark text-light p-3">
+        <div class="row g-2 small">
+            {% for code, district in districts.items %}
+            <div class="col-md-6">
+                <div class="border {% if code == '110108' %}border-danger{% elif code == '110105' %}border-info{% elif code == '110112' %}border-success{% elif code == '110114' %}border-primary{% elif code == '131082' %}border-warning{% else %}border-secondary{% endif %} rounded p-2 mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span class="{% if code == '110108' %}text-danger{% elif code == '110105' %}text-info{% elif code == '110112' %}text-success{% elif code == '110114' %}text-primary{% elif code == '131082' %}text-warning{% else %}text-light{% endif %} fw-bold">{{ district.name }}</span>
+                        <span class="text-warning">¥{{ district.rent }}/月</span>
+                    </div>
+                    <small class="text-muted">{{ district.vibe }}</small>
+                    
+                    <!-- 预估距离信息 -->
+                    {% if district.distance_to_schools %}
+                    <div class="mt-1">
+                        <small class="text-info">
+                            📍 到校距离：
+                            {% for school_code, distance_info in district.distance_to_schools.items %}
+                                {% if school_code == '110105' %}CUC{% else %}PKU{% endif %}{{ distance_info.distance_str }}({{ distance_info.duration_str }}){% if not forloop.last %} | {% endif %}
+                            {% endfor %}
+                        </small>
+                    </div>
+                    {% endif %}
+                    
+                    {% if district.potential_increase != "无" %}
+                    <div class="mt-1">
+                        <small class="text-danger">⚠️ 续约可能涨价{{ district.potential_increase }} (涨至¥{{ district.increased_rent }}/月)</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="alert alert-info bg-transparent border-info mt-2 mb-0">
+            <small>💡 <strong>选址建议：</strong>距离学校越近，通勤体力消耗越低，但房租越高。燕郊虽便宜但跨省通勤极其痛苦。注意部分区域续约时可能涨价！</small>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4 bg-dark border-secondary">
+    <h4 class="text-center mb-4 text-white">点击下方校徽 · 开启你的生涯</h4>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-6">
+                <button type="submit" name="school_code" value="110105" class="btn btn-outline-info w-100 py-4 transition-all hover-glow">
+                    <span class="fs-3 d-block mb-1">🎭 110105</span>
+                    <strong>朝阳某传媒高校 (CUC)</strong><br>
+                    <small class="text-muted">研一提供宿舍 / 两年制专业 / 压力：★☆☆</small>
+                </button>
+            </div>
+            <div class="col-md-6">
+                <button type="submit" name="school_code" value="110108" class="btn btn-outline-warning w-100 py-4 transition-all hover-glow">
+                    <span class="fs-3 d-block mb-1">🏛️ 110108</span>
+                    <strong>海淀某顶级学府 (PKU)</strong><br>
+                    <small class="text-muted">全程不包住 / 三年制学术 / 压力：★★★</small>
+                </button>
+            </div>
+        </div>
+    </form>
+    
+    <!-- 通关次数统计 -->
+    <div class="mt-4 pt-3 border-top border-secondary">
+        <h5 class="text-center text-white mb-3">🏆 历史通关统计</h5>
+        <div class="row text-center">
+            <div class="col-6">
+                <div class="border border-info rounded p-3">
+                    <div class="text-info fw-bold fs-4">{{ cuc_completions }}</div>
+                    <small class="text-muted">CUC通关次数</small>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="border border-warning rounded p-3">
+                    <div class="text-warning fw-bold fs-4">{{ pku_completions }}</div>
+                    <small class="text-muted">PKU通关次数</small>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-2">
+            <small class="text-muted">数据来自所有玩家的历史记录</small>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-glow:hover {
+        box-shadow: 0 0 15px currentColor;
+        transform: translateY(-3px);
+        background-color: rgba(255,255,255,0.05);
+    }
+    .transition-all { transition: all 0.3s ease; }
+</style>
+{% endblock %}

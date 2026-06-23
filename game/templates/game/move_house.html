@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>110114 住房中介</title>
+    <style>
+        body { background: #1a1a1a; color: #eee; font-family: sans-serif; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .house-card { background: #2c3e50; border: 1px solid #444; padding: 15px; border-radius: 10px; }
+        .price { color: #f1c40f; font-size: 1.4em; }
+        .btn-rent { background: #e67e22; border: none; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🏢 北京生存：校外租赁中心</h1>
+    {% if error %}<p style="color: #e74c3c;">{{ error }}</p>{% endif %}
+
+    <div class="grid">
+        {% for code, data in districts.items %}
+        <div class="house-card">
+            <h3>{{ data.name }}</h3>
+            <p>区域代码：{{ code }}</p>
+            <p class="price">¥{{ data.rent }} /月</p>
+            <p>🏠 押一付三：<span style="color:#e74c3c;">¥{{ data.rent|add:data.rent|add:data.rent|add:data.rent }}</span></p>
+            <p style="font-size: 0.8em; color: #888;">{{ data.vibe }}</p>
+            <a href="{% url 'select_district' code %}"><button class="btn-rent">立即签约</button></a>
+        </div>
+        {% endfor %}
+    </div>
+    <br>
+    <a href="{% url 'dashboard' %}" style="color: #3498db;">返回仪表盘</a>
+</body>
+</html>

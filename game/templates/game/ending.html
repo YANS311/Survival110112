@@ -1,0 +1,24 @@
+<div class="container" style="text-align: center; color: #eee; background: #1a1a1a; padding: 50px;">
+    {% if player.ending_type == 'SLAYED_HP' %}
+        <h1 style="color: #e74c3c;">🫠 死因报告：创伤溢出</h1>
+        <p>“杯子满了，还在倒水。”</p>
+        <p>你的 HP 掉到了 {{ player.hp }}。110114 的生存压力最终击垮了你的免疫系统。</p>
+    {% elif player.ending_type == 'SLAYED_MONEY' %}
+        <h1 style="color: #e74c3c;">💸 财务斩杀：北京不相信眼泪</h1>
+        <p>你的余额 ¥{{ player.money }} 已跌破生存红线。房东不再听你的解释，你被清出了 110112。</p>
+    {% elif player.ending_type == 'GRADUATED' %}
+        <h1 style="color: #2ecc71;">🎓 结局：平凡之路</h1>
+        <p>你拿到了学位证，虽然没有去大理，但你活下来了。</p>
+    {% elif player.ending_type == 'PHD' %}
+        <h1 style="color: #f1c40f;">🌟 结局：学术新星</h1>
+        <p>你不仅活下来了，还卷出了高度。导师递来了读博的橄榄枝。</p>
+    {% endif %}
+
+    <div class="npc-box" style="margin-top: 50px; border: 1px solid #444; padding: 20px;">
+        <img src="/static/images/pikachu_jingv.jpg" width="80" style="border-radius: 50%;">
+        <p><strong>京✌ (110101):</strong></p>
+        <p>“皮卡皮卡... 这一路走来，不容易吧？不管结果如何，你至少在 110114 留下过脚印。”</p>
+    </div>
+
+    <a href="{% url 'init_game' %}"><button class="btn" style="margin-top: 30px;">重新投胎 (Re-roll)</button></a>
+</div>

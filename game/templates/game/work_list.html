@@ -1,0 +1,30 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-warning pb-2">
+    <h2 class="text-warning">💼 实习市场 (牛马选址)</h2>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">拒绝内卷 (返回)</a>
+</div>
+
+<div class="row g-3">
+    {% for spot in spots %}
+    <div class="col-md-6">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-body">
+                <h5 class="card-title text-warning">{{ spot.name }}</h5>
+                <p class="text-muted small mb-2">📍 所在地：{{ spot.location }}</p>
+                <p class="card-text">{{ spot.desc }}</p>
+                
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="badge bg-success">💰 +￥{{ spot.salary }}</span>
+                    <span class="badge bg-danger">❤️ -{{ spot.total_hp_drain }} HP</span>
+                    <span class="badge bg-info">🎓 +{{ spot.thesis_gain }}%</span>
+                </div>
+                
+                <a href="{% url 'execute_work' spot.id %}" class="btn btn-warning w-100">投递并立即开工 (-{{ spot.san_cost }} SAN)</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

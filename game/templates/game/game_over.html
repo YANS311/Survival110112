@@ -1,0 +1,153 @@
+{% extends 'game/base.html' %}
+
+{% block content %}
+<div class="text-center mt-5">
+    {% if player.ending_type == 'PHD' or player.ending_type == 'GRADUATED' %}
+    <h1 class="display-1 fw-bold text-success animate__animated animate__fadeIn"
+        style="text-shadow: 0 0 20px rgba(40,167,69,0.7);">
+        {% if player.ending_type == 'PHD' %}🎉 博士毕业！{% else %}🎓 顺利毕业！{% endif %}
+    </h1>
+    {% else %}
+    <h1 class="display-1 fw-bold text-danger animate__animated animate__bloodDrop"
+        style="text-shadow: 0 0 20px rgba(255,0,0,0.7);">
+        GAME OVER
+    </h1>
+    {% endif %}
+
+    <div class="card bg-dark border-danger mt-5 p-0 mx-auto shadow-lg" style="max-width: 600px; border-width: 2px;">
+        <div class="card-header bg-danger text-white py-3">
+            <h4 class="mb-0">📜 2026 研究生生存终结报告</h4>
+        </div>
+
+        <div class="card-body p-4 text-start">
+            <div class="mb-4 text-center">
+                <h2 class="text-warning">
+                    {% if player.ending_type == 'PHD' %}
+                    <span class="text-info">🏆 结局：【学术之巅 · 赛博博士】</span>
+                    {% elif player.ending_type == 'GRADUATED' %}
+                    <span class="text-success">🎓 结局：【平凡之路 · 顺利毕业】</span>
+                    {% elif player.ending_type == 'THORNY_DIPLOMA' %}
+                    <span class="text-warning">🌹 结局：【带刺的毕业证 · 学术韧性】</span>
+                    {% elif player.ending_type == 'LAST_MILE_MIRACLE' %}
+                    <span class="text-info">🚑 结局：【最后一公里的奇迹 · 俸伯救援】</span>
+                    {% elif player.ending_type == 'SANHE_MASTER' %}
+                    🚩 结局：【三河大神 · {{ player.region_name }}分神】
+                    {% elif player.ending_type == 'SLAYED_HP' %}
+                    🚩 结局：【中关村/定福庄 猝死者】
+                    {% elif player.ending_type == 'SLAYED_MONEY' %}
+                    🚩 结局：【欠债百万的赛博浪人】
+                    {% elif player.ending_type == 'SLAYED_ACADEMIC' %}
+                    🚩 结局：【未能抵达终点的牛马】
+                    {% else %}
+                    🚩 结局：【未知的赛博幽灵】
+                    {% endif %}
+                </h2>
+                <span class="text-muted">
+    {% if player.ending_type == 'PHD' %}
+        你的导师紧紧握住你的手，问你愿不愿意留下来建设学科。你看着窗外的夕阳，觉得这 180% 的进度值了。
+    {% elif player.ending_type == 'GRADUATED' %}
+        你拿到了那张沉甸甸的纸。你终于从 110112 宇宙中生还了。
+    {% elif player.ending_type == 'SLAYED_ACADEMIC' %}
+        你熬过了所有的黑夜，却倒在了论文查重的前夕。这种“学术遗憾”将伴随你一生。
+    {% elif player.money > 20000 %}
+        你是个优秀的打工人，甚至可能偷偷成了小富翁，但你的导师已经不记得你是谁了。
+    {% else %}
+        平庸的一生，甚至连回忆都像那篇跑不通的代码一样干瘪。
+    {% endif %}
+</span>
+            </div>
+
+            <table class="table table-dark table-hover border-secondary mt-3">
+                <tbody>
+                <tr>
+                    <td>📅 生存总时长</td>
+                    <td class="text-end fw-bold text-info">{{ player.survival_months }} 个月</td>
+                </tr>
+                <tr>
+                    <td>💰 最终银行余额</td>
+                    <td class="text-end fw-bold {% if player.money < 0 %}text-danger{% else %}text-success{% endif %}">
+                        ￥{{ player.money|floatformat:2 }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>🧠 最终理智 (SAN)</td>
+                    <td class="text-end fw-bold text-warning">{{ player.san }} / {{ player.san_cap }}</td>
+                </tr>
+                <tr>
+                    <td>🎓 论文完成度</td>
+                    <td class="text-end fw-bold text-primary">{{ player.thesis_progress }}%</td>
+                </tr>
+                <tr>
+                    <td>❤️ 身体状况</td>
+                    <td class="text-end fw-bold text-danger">{{ player.hp }} HP</td>
+                </tr>
+                <tr>
+                    <td>🗑️ 精神废料收集量</td>
+                    <td class="text-end fw-bold text-secondary">{{ player.souvenir_count }} 件</td>
+                </tr>
+                <tr>
+                    <td>📍 终结坐标</td>
+                    <td class="text-end fw-bold text-info">{{ player.display_location }}</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-secondary bg-dark border-secondary mt-4">
+                <strong>📝 生涯简评：</strong>
+                <span class="text-muted">
+                    {% if player.ending_type == 'GRADUATED' or player.ending_type == 'PHD' %}
+                        🎉 恭喜！你拿到了那张沉甸甸的纸，从 110112 宇宙中生还了。导师甚至在离别时给了你一个微笑。
+                    {% elif player.thesis_progress > 80 %}
+                        你离毕业只差临门一脚，可惜身体/精神先崩了。这种"学术遗憾"将伴随你一生。
+                    {% else %}
+                        平庸的一生，甚至连回忆都像那篇跑不通的代码一样干瘪。
+                    {% endif %}
+             </span>
+            </div>
+
+            {% if heartbreaking_quote %}
+            {% if player.ending_type == 'GRADUATED' or player.ending_type == 'PHD' or player.ending_type == 'THORNY_DIPLOMA' or player.ending_type == 'LAST_MILE_MIRACLE' %}
+            <div class="alert bg-dark border-success mt-3" style="border-color: #20c997 !important;">
+                <strong>🌟 终局独白：</strong>
+                <span class="text-light fst-italic">
+                    "{{ heartbreaking_quote }}"
+                </span>
+            </div>
+            {% else %}
+            <div class="alert alert-danger bg-dark border-danger mt-3">
+                <strong>💀 终局独白：</strong>
+                <span class="text-light fst-italic">
+                    "{{ heartbreaking_quote }}"
+                </span>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="card-footer bg-transparent border-secondary p-4 d-grid gap-2">
+            <a href="{% url 'init_game' %}" class="btn btn-danger btn-lg shadow">重新开启另一段苦难</a>
+            <a href="/" class="btn btn-outline-secondary">退出模拟</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* 模拟血滴下的动画感 */
+    .animate__bloodDrop {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.7;
+            transform: scale(0.98);
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}
