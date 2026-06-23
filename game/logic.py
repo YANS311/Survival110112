@@ -195,6 +195,27 @@ def process_month_tick(player):
     if player.san > player.san_cap:
         player.san = float(player.san_cap)
 
+    # 🆕 触发动态事件
+    from .events import DynamicEventManager
+    event_manager = DynamicEventManager()
+    event_result = event_manager.trigger_event(player, player.current_month)
+    if event_result:
+        # 事件已触发，保存到 player 上供视图层读取
+        player._last_event = event_result
+
+    # 🆕 检查挖矿被抓概率
+    if getattr(player, 'gpu_mining_active', False):
+        detection_rate = getattr(player, 'mining_detection_rate', 0)
+        if random.random() < detection_rate:
+            player.ending_type = 'ACADEMIC_FRAUD'
+            player.is_game_over = True
+            player.gpu_mining_active = False
+            player.save()
+            return True
+        # 每月增加 15% 被抓概率
+        player.mining_detection_rate = min(detection_rate + 0.15, 1.0)
+        player.money += 800  # 挖矿收入
+
     curr = player.current_month
     if curr.month == 12:
         player.current_month = date(curr.year + 1, 1, 1)

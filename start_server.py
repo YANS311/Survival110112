@@ -18,6 +18,91 @@ import argparse
 import subprocess
 import sys
 import os
+import platform
+import socket
+
+
+def is_port_in_use(port: int) -> bool:
+    """检查端口是否被占用"""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('127.0.0.1', port)) == 0
+
+
+def get_pid_on_port(port: int) -> int | None:
+    """获取占用指定端口的进程 PID"""
+    system = platform.system()
+
+    try:
+        if system == "Windows":
+            # Windows: 使用 netstat 查找占用端口的进程
+            result = subprocess.run(
+                ["netstat", "-ano"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            for line in result.stdout.splitlines():
+                if f":{port}" in line and "LISTENING" in line:
+                    # 提取最后一列的 PID
+                    parts = line.split()
+                    if parts:
+                        pid = int(parts[-1])
+                        return pid
+        elif system == "Linux" or system == "Darwin":
+            # Linux/macOS: 使用 lsof 查找
+            result = subprocess.run(
+                ["lsof", "-i", f":{port}", "-t"],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+            if result.stdout.strip():
+                return int(result.stdout.strip().split('\n')[0])
+    except (subprocess.TimeoutExpired, ValueError, FileNotFoundError):
+        pass
+
+    return None
+
+
+def kill_process_on_port(port: int) -> bool:
+    """强制终止占用指定端口的进程"""
+    pid = get_pid_on_port(port)
+    if pid is None:
+        return False
+
+    system = platform.system()
+    try:
+        if system == "Windows":
+            subprocess.run(
+                ["taskkill", "/F", "/PID", str(pid)],
+                capture_output=True,
+                timeout=5
+            )
+        else:
+            subprocess.run(
+                ["kill", "-9", str(pid)],
+                capture_output=True,
+                timeout=5
+            )
+        print(f"\033[90m[System] 监测到旧的本地服务器残留 (PID: {pid})，已强制释放 {port} 端口...\033[0m")
+        return True
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        return False
+
+
+def ensure_port_available(port: int) -> bool:
+    """确保端口可用，如果被占用则强制释放"""
+    if not is_port_in_use(port):
+        return True
+
+    print(f"\033[93m[Warning] 端口 {port} 已被占用，正在尝试释放...\033[0m")
+    if kill_process_on_port(port):
+        # 等待一小段时间让端口释放
+        import time
+        time.sleep(0.5)
+        return not is_port_in_use(port)
+    return False
+
 
 def main():
     parser = argparse.ArgumentParser(description="Start the Survival110112 ASGI server")
@@ -36,6 +121,11 @@ def main():
         host    = args.host
         workers = args.workers
         reload  = args.reload
+
+    # 🆕 确保端口可用
+    if not ensure_port_available(args.port):
+        print(f"\033[91m[Error] 无法释放端口 {args.port}，请手动检查或使用 --port 指定其他端口。\033[0m")
+        sys.exit(1)
 
     # Resolve uvicorn path inside the venv
     venv_uvicorn = os.path.join(
@@ -71,7 +161,13 @@ def main():
     print("=" * 60)
     print()
 
-    subprocess.run(cmd, check=True)
+    try:
+        subprocess.run(cmd, check=True)
+    except KeyboardInterrupt:
+        print("\n\033[90m[System] 服务器已停止。\033[0m")
+    except subprocess.CalledProcessError as e:
+        print(f"\033[91m[Error] 服务器启动失败: {e}\033[0m")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

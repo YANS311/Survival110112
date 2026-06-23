@@ -57,6 +57,15 @@ class Player(models.Model):
     # 行为序列
     action_history = models.TextField(default="", blank=True)  # 存储逗号分隔的动作字符串
 
+    # 🆕 生存挣扎机制字段
+    hp_max = models.FloatField(default=100.0)  # HP 上限（水导黑市交易可永久降低）
+    gpu_mining_active = models.BooleanField(default=False)  # 是否在挖矿
+    mining_detection_rate = models.FloatField(default=0.0)  # 挖矿被抓概率
+    dorm_eviction_phase_1_done = models.BooleanField(default=False)
+    dorm_eviction_phase_2_done = models.BooleanField(default=False)
+    dorm_eviction_phase_3_done = models.BooleanField(default=False)
+    dorm_eviction_forced_done = models.BooleanField(default=False)
+
     @property
     def souvenirs_list(self):
         """前端模板调用，返回列表"""

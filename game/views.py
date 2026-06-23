@@ -765,6 +765,13 @@ def process_settlement(request):
             messages.warning(request, "⚠️ 租约已到期！房东正在敲门，请处理续约事宜。")
             return redirect('dashboard')
         else:
+            # 🆕 显示触发的事件
+            last_event = getattr(player, '_last_event', None)
+            if last_event:
+                event = last_event['event']
+                effect = last_event['effect']
+                messages.info(request, f"🎲 {event.name}\n{event.description}")
+
             # 【修复重点 2】：这里如果判定游戏结束，不应该再跳回 dashboard，直接去 game_over
             if player.is_game_over:
                 if player.ending_type == 'PHD':
@@ -779,6 +786,8 @@ def process_settlement(request):
                     messages.error(request, "💀 债务缠身，被迫退学...")
                 elif player.ending_type == 'SANHE_MASTER':
                     messages.error(request, "💀 理智归零，成为了三河大神...")
+                elif player.ending_type == 'ACADEMIC_FRAUD':
+                    messages.error(request, "💀 学术不端被发现，遣送回籍...")
                 else:
                     messages.error(request, "💀 终局已至。")
                 return redirect('game_over')
