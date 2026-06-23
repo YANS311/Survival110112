@@ -1,7 +1,8 @@
 # game/logic.py
 import random
 from datetime import timedelta, date
-from .constants import DISTRICT_DATA, SCHOOL_POLICIES, SCHOOL_DISTRICT_RELATION, DEFAULT_COMMUTE
+from .constants import (DISTRICT_DATA, SCHOOL_POLICIES, SCHOOL_DISTRICT_RELATION,
+                        DEFAULT_COMMUTE, DORM_EVICTION_MAIN_QUEST)
 
 
 def calculate_living_buffs(player):
@@ -141,6 +142,13 @@ def process_month_tick(player):
                 player.save()
                 return False
             # 🆕 修复：如果已经处于续约危机状态，不再重复触发，继续正常跨月流程
+
+    # 🆕 CUC 宿舍清退主线事件检查
+    if player.school_code == '110105' and not player.is_dorm_cleared:
+        dorm_quest_result = check_dorm_eviction_quest(player)
+        if dorm_quest_result:
+            player.save()
+            return False  # 暂停跨月，等待玩家选择
 
     player.has_moved_this_month = False
     player.san_cap = getattr(player, 'next_month_san_cap', 100)
@@ -293,3 +301,113 @@ def check_game_status(player):
         return True
 
     return False
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 🆕 CUC 宿舍清退主线事件
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def check_dorm_eviction_quest(player):
+    """
+    检查是否触发宿舍清退主线事件。
+    返回事件数据如果需要暂停跨月，返回 None 如果无需暂停。
+    """
+    current = player.current_month
+    quest = DORM_EVICTION_MAIN_QUEST
+
+    # 遍历三个阶段
+    for i, phase in enumerate(quest['phases']):
+        phase_month = date(current.year, phase['month'][1], 1)
+        phase_key = f'dorm_eviction_phase_{i+1}_done'
+
+        # 检查当前月份是否匹配，且该阶段未完成
+        if current.year == phase['month'][0] and current.month == phase['month'][1]:
+            if not getattr(player, phase_key, False):
+                return {
+                    'type': 'dorm_eviction',
+                    'phase': i + 1,
+                    'title': phase['title'],
+                    'desc': phase['desc'],
+                    'options': phase['options']
+                }
+
+    # 第四阶段：如果到了 2026 年 8 月还没搬，强制清退
+    if current.year == 2026 and current.month >= 8:
+        if not player.is_dorm_cleared:
+            # 检查是否已经处理过强制清退
+            if not getattr(player, 'dorm_eviction_forced_done', False):
+                return {
+                    'type': 'dorm_eviction',
+                    'phase': 4,
+                    'title': quest['phase_4']['title'],
+                    'desc': quest['phase_4']['desc'],
+                    'options': {}  # 无选项，直接强制执行
+                }
+
+    return None
+
+
+def process_dorm_eviction_choice(player, phase, choice):
+    """
+    处理宿舍清退主线事件的玩家选择。
+    phase: 阶段 (1-4)
+    choice: 选项 ('A', 'B', 'C')
+    """
+    quest = DORM_EVICTION_MAIN_QUEST
+
+    if phase == 4:
+        # 强制清退阶段，无选择
+        player.is_dorm_cleared = True
+        player.current_district = None  # 流浪
+        player.san = max(0, player.san - 30)
+        player.hp = max(0, player.hp - 20)
+        player.dorm_eviction_forced_done = True
+        player.save()
+        return {'success': True, 'msg': '你被强制清退，现在是街头流浪状态。'}
+
+    # 获取对应阶段的选项
+    phase_data = quest['phases'][phase - 1]
+    if choice not in phase_data['options']:
+        return {'success': False, 'msg': '无效选项'}
+
+    option = phase_data['options'][choice]
+
+    # 应用数值变化
+    if 'money' in option:
+        player.money = round(player.money + option['money'], 2)
+    if 'san' in option:
+        player.san = round(player.san + option['san'], 2)
+    if 'hp' in option:
+        player.hp = round(player.hp + option['hp'], 2)
+    if 'thesis' in option:
+        player.thesis_progress = round(player.thesis_progress + option['thesis'], 2)
+
+    # 设置标记
+    if 'flag' in option:
+        setattr(player, option['flag'], True)
+    if 'action' in option:
+        # 处理特殊动作
+        action = option['action']
+        if action == 'dorm_eviction_normal':
+            player.is_dorm_cleared = True
+            # 如果已经租房，自动入住
+            if not player.current_district and getattr(player, 'dorm_eviction_rented', False):
+                player.current_district = '110112'  # 默认通州
+        elif action == 'dorm_eviction_delay_3days':
+            # 延期 3 天，设置一个标记让下个月再检查
+            player.dorm_eviction_delayed = True
+        elif action == 'dorm_eviction_forced':
+            player.is_dorm_cleared = True
+            player.current_district = None
+            player.san = max(0, player.san - 20)
+
+    # 标记该阶段完成
+    setattr(player, f'dorm_eviction_phase_{phase}_done', True)
+    player.save()
+
+    return {
+        'success': True,
+        'msg': option['desc'],
+        'flag': option.get('flag'),
+        'action': option.get('action')
+    }

@@ -442,6 +442,97 @@ TIMELINE_EVENTS = [
     {'date': '2026-12', 'event': 'SUBWAY_22_OPEN', 'desc': '地铁22号线全线贯通 (平谷-燕郊-朝阳)'},
 ]
 
+# 🆕 CUC 宿舍清退主线事件 (剧情选择式)
+DORM_EVICTION_MAIN_QUEST = {
+    'phases': [
+        {
+            'month': (2026, 5),
+            'title': '【宿舍清退预告】学校发来通知',
+            'desc': '你收到学院通知：因专硕扩招，现有宿舍资源不足，研二学生需在 7 月底前腾退宿舍。你还有 2 个月时间准备。',
+            'options': {
+                'A': {
+                    'name': '【提前找房】开始在通州/朝阳看房',
+                    'money': -500,  # 看房交通费
+                    'san': -10,
+                    'desc': '提前行动，心里有底。但看房路上的奔波让你有些疲惫。',
+                    'flag': 'dorm_eviction_prep_start'
+                },
+                'B': {
+                    'name': '【找辅导员求情】试试能不能续住',
+                    'san': -20,
+                    'desc': '辅导员说"政策就是这样，我也无能为力"。你白跑一趟，心情更差了。',
+                    'flag': 'dorm_eviction_tried_beg'
+                },
+                'C': {
+                    'name': '【假装没看见】先拖着再说',
+                    'san': -5,
+                    'desc': '你选择性忽略了这封通知。至少今晚能睡个好觉。',
+                    'flag': 'dorm_eviction_ignored'
+                }
+            }
+        },
+        {
+            'month': (2026, 6),
+            'title': '【宿舍清退倒计时】最后一个月',
+            'desc': '距离腾退还有 30 天。学院开始逐个约谈，你的舍友已经搬走了两个。',
+            'options': {
+                'A': {
+                    'name': '【确定房源】签下租约',
+                    'money': -3000,  # 押一付三
+                    'san': -15,
+                    'desc': '你在通州签下了一间次卧，虽然远了点，但至少有地方住了。',
+                    'flag': 'dorm_eviction_rented'
+                },
+                'B': {
+                    'name': '【找师兄合租】在昌平找了个床位',
+                    'money': -1500,
+                    'san': -10,
+                    'thesis': -5,
+                    'desc': '师兄住天通苑，虽然挤了点，但能互相照应。就是通勤太远了。',
+                    'flag': 'dorm_eviction_shared'
+                },
+                'C': {
+                    'name': '【继续摆烂】拒绝面对现实',
+                    'san': -25,
+                    'desc': '你在宿舍里打了一天游戏。但行李箱还摊在床上，什么都没收拾。',
+                    'flag': 'dorm_eviction_denial'
+                }
+            }
+        },
+        {
+            'month': (2026, 7),
+            'title': '【宿舍清退执行日】最后通牒',
+            'desc': '今天是腾退截止日。宿管阿姨已经在楼下等着收钥匙了。你的东西还堆在床上。',
+            'options': {
+                'A': {
+                    'name': '【有序搬离】按计划搬到新住处',
+                    'san': -5,
+                    'desc': '虽然累，但一切都在掌控之中。你正式成为北漂租房族。',
+                    'action': 'dorm_eviction_normal'
+                },
+                'B': {
+                    'name': '【求情延期】再宽限几天',
+                    'san': -20,
+                    'desc': '宿管阿姨看在你帮她搬过桌子的份上，多给了你 3 天。',
+                    'action': 'dorm_eviction_delay_3days'
+                },
+                'C': {
+                    'name': '【暴力抗法】死活不搬',
+                    'san': -40,
+                    'hp': -30,
+                    'desc': '你和宿管阿姨吵了一架，最后被保安"请"了出去。行李散落一地。',
+                    'action': 'dorm_eviction_forced'
+                }
+            }
+        }
+    ],
+    'phase_4': {  # 强制执行：如果玩家还没搬
+        'title': '【强制腾退】保安上门',
+        'desc': '你的东西被堆到了楼道里。你抱着最后一箱行李，在定福庄的夜色中茫然四顾。',
+        'action': 'dorm_eviction_forced'
+    }
+}
+
 # 🆕 新增结局类型
 ENDING_TYPES = {
     'GRADUATED': '毕业',
