@@ -33,11 +33,11 @@
                     {% elif player.ending_type == 'SANHE_MASTER' %}
                     🚩 结局：【三河大神 · 燕郊显灵】
                     {% elif player.ending_type == 'SAN_BREAKDOWN' %}
-                    🧠 结局：【理智崩塌 · {{ player.region_name }}失心疯】
+                    🧠 结局：【理智崩塌 · {{ player.death_location_name }}失心疯】
                     {% elif player.ending_type == 'ACADEMIC_FRAUD' %}
                     🚫 结局：【学术不端 · 遣送回籍】
                     {% elif player.ending_type == 'SLAYED_HP' %}
-                    🚩 结局：【中关村/定福庄 猝死者】
+                    🚩 结局：【{{ player.death_location_name }} 猝死者】
                     {% elif player.ending_type == 'SLAYED_MONEY' %}
                     🚩 结局：【欠债百万的赛博浪人】
                     {% elif player.ending_type == 'SLAYED_ACADEMIC' %}

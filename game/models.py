@@ -95,8 +95,25 @@ class Player(models.Model):
 
     @property
     def region_name(self):
-        """区域简称"""
+        """区域简称（学校所在区域）"""
         return "定福庄" if self.school_code == '110105' else "中关村"
+
+    @property
+    def death_location_name(self):
+        """死亡时的实际位置简称"""
+        if not self.current_district:
+            return self.region_name  # 流浪时显示学校区域
+        location_names = {
+            '110108': '中关村',
+            '110105': '定福庄',
+            '110112': '通州',
+            '110114': '天通苑',
+            '110113': '顺义',
+            '131082': '燕郊',
+            '110115': '亦庄',
+            '110117': '平谷',
+        }
+        return location_names.get(self.current_district, self.region_name)
 
     @property
     def spot_code(self):
