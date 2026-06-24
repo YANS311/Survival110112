@@ -275,7 +275,7 @@ def dashboard(request):
 
     # --- 🆕 解析已购纪念品详情 ---
     from .constants import LEISURE_SPOTS
-    owned_ids = player.souvenirs_list  # 调用 models 里的属性获取 ID 列表
+    owned_ids = player.souvenirs_list
     owned_items = []
     for sid in owned_ids:
         item_data = LEISURE_SPOTS.get(sid)
@@ -293,6 +293,34 @@ def dashboard(request):
 
     if is_truly_homeless:
         messages.warning(request, "⚠️ 你正处于流浪状态！由于缺乏睡眠和安全感，HP 正在大幅下降。")
+
+    # 🆕 提前初始化 settlement_data 和 distance_info
+    current_month_idx = player.current_month.month
+    settlement_data = MONTHLY_SETTLEMENTS.get(current_month_idx, MONTHLY_SETTLEMENTS[1])
+
+    distance_info = None
+    if player.current_district:
+        school_coordinates = {
+            '110105': {'lng': 116.549348, 'lat': 39.917044},
+            '110108': {'lng': 116.311188, 'lat': 39.992236},
+        }
+        district_coordinates = {
+            '110108': {'lng': 116.311188, 'lat': 39.992236},
+            '110105': {'lng': 116.549348, 'lat': 39.917044},
+            '110112': {'lng': 116.656435, 'lat': 39.902645},
+            '110114': {'lng': 116.326222, 'lat': 40.078594},
+            '110113': {'lng': 116.653519, 'lat': 40.123456},
+            '131082': {'lng': 116.813822, 'lat': 39.953632},
+            '110115': {'lng': 116.493519, 'lat': 39.723456},
+            '110117': {'lng': 117.123456, 'lat': 40.123456},
+        }
+        if player.school_code in school_coordinates and player.current_district in district_coordinates:
+            school_coord = school_coordinates[player.school_code]
+            district_coord = district_coordinates[player.current_district]
+            distance_info = calculate_distance_with_amap(
+                district_coord['lng'], district_coord['lat'],
+                school_coord['lng'], school_coord['lat']
+            )
 
     # 🆕 检查宿舍清退主线事件
     if player.school_code == '110105' and not player.is_dorm_cleared:
@@ -314,7 +342,6 @@ def dashboard(request):
     from .events import check_survival_struggle
     survival_options = check_survival_struggle(player)
     if survival_options:
-        # 将生存挣扎选项传递给模板
         context = {
             'player': player,
             'settlement_data': settlement_data,
@@ -332,47 +359,13 @@ def dashboard(request):
     if player.is_game_over:
         return render(request, 'game/game_over.html', {'player': player})
 
-    current_month_idx = player.current_month.month
-    settlement_data = MONTHLY_SETTLEMENTS.get(current_month_idx, MONTHLY_SETTLEMENTS[1])
-
-    # 🆕 计算当前位置到学校的距离信息
-    distance_info = None
-    if player.current_district:
-        # 学校坐标
-        school_coordinates = {
-            '110105': {'lng': 116.549348, 'lat': 39.917044},  # CUC
-            '110108': {'lng': 116.311188, 'lat': 39.992236},  # PKU
-        }
-        
-        # 区域坐标
-        district_coordinates = {
-            '110108': {'lng': 116.311188, 'lat': 39.992236},  # 海淀
-            '110105': {'lng': 116.549348, 'lat': 39.917044},  # 朝阳
-            '110112': {'lng': 116.656435, 'lat': 39.902645},  # 通州
-            '110114': {'lng': 116.326222, 'lat': 40.078594},  # 昌平
-            '110113': {'lng': 116.653519, 'lat': 40.123456},  # 顺义
-            '131082': {'lng': 116.813822, 'lat': 39.953632},  # 燕郊
-            '110115': {'lng': 116.493519, 'lat': 39.723456},  # 亦庄
-            '110117': {'lng': 117.123456, 'lat': 40.123456},  # 平谷
-        }
-        
-        if player.school_code in school_coordinates and player.current_district in district_coordinates:
-            school_coord = school_coordinates[player.school_code]
-            district_coord = district_coordinates[player.current_district]
-            
-            # 计算距离
-            distance_info = calculate_distance_with_amap(
-                district_coord['lng'], district_coord['lat'],
-                school_coord['lng'], school_coord['lat']
-            )
-
     context = {
         'player': player,
         'settlement_data': settlement_data,
-        'owned_souvenirs': owned_items,  # 🆕 传给前端
+        'owned_souvenirs': owned_items,
         'renewal_data': renewal_data,
         'risk_resistance': getattr(player, 'risk_resistance', 50),
-        'distance_info': distance_info,  # 🆕 距离信息
+        'distance_info': distance_info,
     }
     return render(request, 'game/dashboard.html', context)
 
