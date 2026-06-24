@@ -420,8 +420,15 @@ def process_dorm_eviction_choice(player, phase, choice):
                 if getattr(player, 'dorm_eviction_rented', False):
                     player.current_district = '110112'  # 默认通州
                 else:
-                    # 没租房也给个默认住处，避免流浪
-                    player.current_district = '110112'  # 通州
+                    # 没租房也给个默认住处，模拟正常租房流程
+                    from .constants import DISTRICT_DATA
+                    default_district = '110112'  # 通州
+                    rent = DISTRICT_DATA[default_district]['rent']
+                    signing_cost = rent * 5  # 押一付三 + 中介费
+                    player.money = round(player.money - signing_cost, 2)
+                    player.current_district = default_district
+                    player.deposit_held = rent
+                    player.rent_contract_end = player.current_month + timedelta(days=180)
         elif action == 'dorm_eviction_delay_3days':
             # 延期 3 天，设置一个标记让下个月再检查
             player.dorm_eviction_delayed = True
