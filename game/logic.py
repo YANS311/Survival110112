@@ -383,12 +383,18 @@ def process_dorm_eviction_choice(player, phase, choice):
     if phase == 4:
         # 强制清退阶段，无选择
         player.is_dorm_cleared = True
-        player.current_district = None  # 流浪
         player.san = max(0, player.san - 30)
         player.hp = max(0, player.hp - 20)
         player.dorm_eviction_forced_done = True
+
+        # 检查是否已有住处，有则保留，无则流浪
+        if player.current_district:
+            msg = f'你被强制清退，但好在已经租好了 {player.get_district_name()} 的房子。'
+        else:
+            msg = '你被强制清退，现在是街头流浪状态。'
+
         player.save()
-        return {'success': True, 'msg': '你被强制清退，现在是街头流浪状态。'}
+        return {'success': True, 'msg': msg}
 
     # 获取对应阶段的选项
     phase_data = quest['phases'][phase - 1]
@@ -434,7 +440,9 @@ def process_dorm_eviction_choice(player, phase, choice):
             player.dorm_eviction_delayed = True
         elif action == 'dorm_eviction_forced':
             player.is_dorm_cleared = True
-            player.current_district = None
+            # 只有没有住处时才变流浪
+            if not player.current_district:
+                player.current_district = None  # 保持流浪
             player.san = max(0, player.san - 20)
 
     # 标记该阶段完成
