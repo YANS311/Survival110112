@@ -274,8 +274,14 @@ def check_game_status(player):
             return True
 
     if player.san < 0:
+        # 三河大神结局：仅在燕郊触发
+        if player.current_district == '131082':
+            player.is_game_over = True
+            player.ending_type = 'SANHE_MASTER'
+            return True
+        # 其他地区 SAN 归零：触发"理智崩塌"结局
         player.is_game_over = True
-        player.ending_type = 'SANHE_MASTER'
+        player.ending_type = 'SAN_BREAKDOWN'
         return True
 
     # 🆕 中期答辩检查

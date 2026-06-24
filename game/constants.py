@@ -538,11 +538,13 @@ ENDING_TYPES = {
     'GRADUATED': '毕业',
     'PHD': '博士',
     'SANHE_MASTER': '三河大神',
+    'SAN_BREAKDOWN': '理智崩塌',  # 🆕 非燕郊地区SAN归零
     'SLAYED_HP': '猝死',
     'SLAYED_MONEY': '欠债',
     'SLAYED_ACADEMIC': '学术失败',
     'THORNY_DIPLOMA': '带刺的毕业证',  # 🆕 学术韧性结局
     'LAST_MILE_MIRACLE': '最后一公里的奇迹',  # 🆕 顺义特供结局
+    'ACADEMIC_FRAUD': '学术不端',  # 🆕 挖矿被抓
 }
 
 # 🆕 扎心文案库：根据终结坐标和条件触发

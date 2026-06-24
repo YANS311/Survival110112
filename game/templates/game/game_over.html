@@ -31,7 +31,11 @@
                     {% elif player.ending_type == 'LAST_MILE_MIRACLE' %}
                     <span class="text-info">🚑 结局：【最后一公里的奇迹 · 俸伯救援】</span>
                     {% elif player.ending_type == 'SANHE_MASTER' %}
-                    🚩 结局：【三河大神 · {{ player.region_name }}分神】
+                    🚩 结局：【三河大神 · 燕郊显灵】
+                    {% elif player.ending_type == 'SAN_BREAKDOWN' %}
+                    🧠 结局：【理智崩塌 · {{ player.region_name }}失心疯】
+                    {% elif player.ending_type == 'ACADEMIC_FRAUD' %}
+                    🚫 结局：【学术不端 · 遣送回籍】
                     {% elif player.ending_type == 'SLAYED_HP' %}
                     🚩 结局：【中关村/定福庄 猝死者】
                     {% elif player.ending_type == 'SLAYED_MONEY' %}
@@ -97,8 +101,16 @@
                 <span class="text-muted">
                     {% if player.ending_type == 'GRADUATED' or player.ending_type == 'PHD' %}
                         🎉 恭喜！你拿到了那张沉甸甸的纸，从 110112 宇宙中生还了。导师甚至在离别时给了你一个微笑。
+                    {% elif player.ending_type == 'SANHE_MASTER' %}
+                        你在燕郊的网吧里找到了人生的终极答案。没有论文，没有导师，只有永恒的日结和永不停歇的键盘声。
+                    {% elif player.ending_type == 'SAN_BREAKDOWN' %}
+                        你的理智在 {{ player.region_name }} 的某个夜晚彻底崩塌。现在你分不清代码和现实，导师的消息你再也看不到了。
+                    {% elif player.ending_type == 'ACADEMIC_FRAUD' %}
+                        你偷偷用 4080 挖矿的行为被导师发现。学术不端的帽子扣了下来，你被遣送回籍，学术生涯就此终结。
                     {% elif player.thesis_progress > 80 %}
                         你离毕业只差临门一脚，可惜身体/精神先崩了。这种"学术遗憾"将伴随你一生。
+                    {% elif player.money > 20000 %}
+                        你是个优秀的打工人，甚至可能偷偷成了小富翁，但你的导师已经不记得你是谁了。
                     {% else %}
                         平庸的一生，甚至连回忆都像那篇跑不通的代码一样干瘪。
                     {% endif %}

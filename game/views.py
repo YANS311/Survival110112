@@ -785,7 +785,9 @@ def process_settlement(request):
                 elif player.ending_type == 'SLAYED_MONEY':
                     messages.error(request, "💀 债务缠身，被迫退学...")
                 elif player.ending_type == 'SANHE_MASTER':
-                    messages.error(request, "💀 理智归零，成为了三河大神...")
+                    messages.error(request, "💀 理智归零，在燕郊网吧觉醒为三河大神...")
+                elif player.ending_type == 'SAN_BREAKDOWN':
+                    messages.error(request, "🧠 理智彻底崩塌，你已经分不清代码和现实了...")
                 elif player.ending_type == 'ACADEMIC_FRAUD':
                     messages.error(request, "💀 学术不端被发现，遣送回籍...")
                 else:
