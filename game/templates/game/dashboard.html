@@ -100,6 +100,44 @@
     <div class="row g-4">
         <div class="col-lg-8">
 
+            <!-- 🆕 宿舍清退主线事件 -->
+            {% if dorm_quest %}
+            <div class="card bg-dark border-danger mb-4 shadow" style="border-width: 2px;">
+                <div class="card-header bg-danger text-white py-2">
+                    <h5 class="mb-0">🚨 {{ dorm_quest.title }}</h5>
+                </div>
+                <div class="card-body p-3">
+                    <p class="text-light mb-3">{{ dorm_quest.desc }}</p>
+                    {% if dorm_quest.options %}
+                        {% for key, option in dorm_quest.options.items %}
+                        <div class="mb-2 p-3 bg-dark border border-secondary rounded">
+                            <h6 class="text-warning">{{ option.name }}</h6>
+                            <p class="text-muted mb-2">{{ option.desc }}</p>
+                            <form action="{% url 'handle_dorm_eviction' %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="phase" value="{{ dorm_quest.phase }}">
+                                <input type="hidden" name="choice" value="{{ key }}">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    选择此选项
+                                </button>
+                            </form>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- 强制清退，无选项 -->
+                        <form action="{% url 'handle_dorm_eviction' %}" method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="phase" value="4">
+                            <input type="hidden" name="choice" value="FORCE">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                确认被强制清退
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- 🆕 生存挣扎选项 -->
             {% if survival_options %}
             <div class="card bg-dark border-warning mb-4 shadow" style="border-width: 2px;">

@@ -35,4 +35,7 @@ urlpatterns = [
 
     # 🆕 生存挣扎机制
     path('survival_struggle/', views.handle_survival_struggle, name='handle_survival_struggle'),
+
+    # 🆕 宿舍清退主线事件
+    path('dorm_eviction/', views.handle_dorm_eviction, name='handle_dorm_eviction'),
 ]

@@ -294,6 +294,22 @@ def dashboard(request):
     if is_truly_homeless:
         messages.warning(request, "⚠️ 你正处于流浪状态！由于缺乏睡眠和安全感，HP 正在大幅下降。")
 
+    # 🆕 检查宿舍清退主线事件
+    if player.school_code == '110105' and not player.is_dorm_cleared:
+        from .logic import check_dorm_eviction_quest
+        dorm_quest = check_dorm_eviction_quest(player)
+        if dorm_quest:
+            context = {
+                'player': player,
+                'settlement_data': settlement_data,
+                'owned_souvenirs': owned_items,
+                'renewal_data': renewal_data,
+                'risk_resistance': getattr(player, 'risk_resistance', 50),
+                'distance_info': distance_info,
+                'dorm_quest': dorm_quest,
+            }
+            return render(request, 'game/dashboard.html', context)
+
     # 🆕 检查生存挣扎机制
     from .events import check_survival_struggle
     survival_options = check_survival_struggle(player)
@@ -996,5 +1012,30 @@ def handle_survival_struggle(request):
     # 如果游戏结束，跳转到结束页面
     if player.is_game_over:
         return redirect('game_over')
+
+    return redirect('dashboard')
+
+
+def handle_dorm_eviction(request):
+    """处理宿舍清退主线事件选择"""
+    player = get_current_player()
+    if not player or request.method != 'POST':
+        return redirect('dashboard')
+
+    phase = request.POST.get('phase')
+    choice = request.POST.get('choice')
+
+    if not phase or not choice:
+        return redirect('dashboard')
+
+    phase = int(phase)
+
+    from .logic import process_dorm_eviction_choice
+    result = process_dorm_eviction_choice(player, phase, choice)
+
+    if result['success']:
+        messages.info(request, result['msg'])
+    else:
+        messages.error(request, result['msg'])
 
     return redirect('dashboard')

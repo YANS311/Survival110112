@@ -154,9 +154,7 @@ def process_month_tick(player):
     player.san_cap = getattr(player, 'next_month_san_cap', 100)
     player.next_month_san_cap = 100
 
-    if player.school_code == '110105':
-        if player.current_month >= date(2026, 8, 1):
-            player.is_dorm_cleared = True
+    # 注意：宿舍清退已完全由主线事件系统处理，不再直接设置 is_dorm_cleared
 
     buffs = calculate_living_buffs(player)
 
