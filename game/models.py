@@ -65,6 +65,14 @@ class Player(models.Model):
     dorm_eviction_phase_2_done = models.BooleanField(default=False)
     dorm_eviction_phase_3_done = models.BooleanField(default=False)
     dorm_eviction_forced_done = models.BooleanField(default=False)
+    temp_housing_active = models.BooleanField(default=False)  # 临时包住状态（航司/企业提供）
+    dorm_eviction_rented = models.BooleanField(default=False)  # 宿舍清退时已租房
+    dorm_eviction_prep_start = models.BooleanField(default=False)  # 宿舍清退准备阶段标记
+    dorm_eviction_tried_beg = models.BooleanField(default=False)  # 尝试求情标记
+    dorm_eviction_ignored = models.BooleanField(default=False)  # 忽略通知标记
+    dorm_eviction_shared = models.BooleanField(default=False)  # 找师兄合租标记
+    dorm_eviction_denial = models.BooleanField(default=False)  # 摆烂标记
+    dorm_eviction_delayed = models.BooleanField(default=False)  # 延期标记
 
     @property
     def souvenirs_list(self):
@@ -180,7 +188,8 @@ class Player(models.Model):
         m_score = min(max(self.money / 15000, 0), 1) * 40
 
         # 2. 身体与理智 (各占 20%)
-        h_score = min(max(self.hp / 100, 0), 1) * 20
+        hp_max = getattr(self, 'hp_max', 100) or 100  # 防止 None
+        h_score = min(max(self.hp / hp_max, 0), 1) * 20
         s_score = min(max(self.san / 100, 0), 1) * 20
 
         # 3. 学术权重 (占 20%) - CUC 100% 满分，PKU 180% 满分
