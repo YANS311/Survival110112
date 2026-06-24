@@ -483,7 +483,8 @@ def check_survival_struggle(player) -> Optional[dict]:
         })
 
     # ── 2. 理智崩塌的网吧难民 ────────────────────────────────────────────────
-    if player.san <= 0 and player.current_district == '131082':
+    # 注意：SAN=0 时不触发，只有 SAN<0 时才触发（与 logic.py 保持一致）
+    if player.san < 0 and player.current_district == '131082' and not player.is_game_over:
         options.append({
             'type': 'sanhe_master',
             'name': '【三河大神觉醒】',

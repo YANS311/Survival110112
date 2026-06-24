@@ -294,6 +294,22 @@ def dashboard(request):
     if is_truly_homeless:
         messages.warning(request, "⚠️ 你正处于流浪状态！由于缺乏睡眠和安全感，HP 正在大幅下降。")
 
+    # 🆕 检查生存挣扎机制
+    from .events import check_survival_struggle
+    survival_options = check_survival_struggle(player)
+    if survival_options:
+        # 将生存挣扎选项传递给模板
+        context = {
+            'player': player,
+            'settlement_data': settlement_data,
+            'owned_souvenirs': owned_items,
+            'renewal_data': renewal_data,
+            'risk_resistance': getattr(player, 'risk_resistance', 50),
+            'distance_info': distance_info,
+            'survival_options': survival_options,
+        }
+        return render(request, 'game/dashboard.html', context)
+
     if player.school_code == '110105' and player.current_month.year == 2026 and player.current_month.month == 7:
         messages.error(request, "🚨 宿管通知：本月底将进行宿舍清场，请 110105 的同学抓紧寻找住处！")
 
@@ -938,5 +954,47 @@ def quick_rest(request):
         # 防止进度变负数
         player.thesis_progress = max(0.0, player.thesis_progress - 5.0)
         player.save()
+
+    return redirect('dashboard')
+
+
+def handle_survival_struggle(request):
+    """处理生存挣扎选项"""
+    player = get_current_player()
+    if not player or request.method != 'POST':
+        return redirect('dashboard')
+
+    action = request.POST.get('survival_action')
+    if not action:
+        return redirect('dashboard')
+
+    from .events import execute_survival_struggle, check_survival_struggle
+
+    # 找到对应的选项
+    options = check_survival_struggle(player)
+    if not options:
+        return redirect('dashboard')
+
+    selected_option = None
+    for opt in options:
+        if opt['action'] == action:
+            selected_option = opt
+            break
+
+    if not selected_option:
+        messages.error(request, "❌ 无效操作")
+        return redirect('dashboard')
+
+    # 执行操作
+    result = execute_survival_struggle(player, selected_option)
+
+    if result['success']:
+        messages.info(request, result['msg'])
+    else:
+        messages.error(request, result['msg'])
+
+    # 如果游戏结束，跳转到结束页面
+    if player.is_game_over:
+        return redirect('game_over')
 
     return redirect('dashboard')

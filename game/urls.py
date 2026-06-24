@@ -32,4 +32,7 @@ urlpatterns = [
     # 致谢环节
     path('thank_you_moment/', views.thank_you_moment_page, name='thank_you_moment'),
     path('thank_you_action/', views.thank_you_action, name='thank_you_action'),
+
+    # 🆕 生存挣扎机制
+    path('survival_struggle/', views.handle_survival_struggle, name='handle_survival_struggle'),
 ]
