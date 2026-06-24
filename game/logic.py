@@ -416,8 +416,12 @@ def process_dorm_eviction_choice(player, phase, choice):
         if action == 'dorm_eviction_normal':
             player.is_dorm_cleared = True
             # 如果已经租房，自动入住
-            if not player.current_district and getattr(player, 'dorm_eviction_rented', False):
-                player.current_district = '110112'  # 默认通州
+            if not player.current_district:
+                if getattr(player, 'dorm_eviction_rented', False):
+                    player.current_district = '110112'  # 默认通州
+                else:
+                    # 没租房也给个默认住处，避免流浪
+                    player.current_district = '110112'  # 通州
         elif action == 'dorm_eviction_delay_3days':
             # 延期 3 天，设置一个标记让下个月再检查
             player.dorm_eviction_delayed = True
