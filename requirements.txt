@@ -1,3 +1,4 @@
 Django>=5.0
 django-ninja>=1.0
 uvicorn[standard]>=0.20
+python-dotenv>=1.0

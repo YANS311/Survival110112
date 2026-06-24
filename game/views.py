@@ -1,4 +1,5 @@
 # game/views.py
+import os
 import random
 from datetime import timedelta, date
 from django.contrib import messages
@@ -108,9 +109,8 @@ def init_game(request):
 def calculate_distance_with_amap(from_lng, from_lat, to_lng, to_lat):
     """使用高德地图API计算两点间的距离和时间"""
 
-    
     # 高德地图API配置
-    api_key = "ec7fcd6803b73661f18a80fb095824c5"  # 使用天气API相同的key
+    api_key = os.environ.get('AMAP_API_KEY', '')
     
     # 构建请求URL
     url = "https://restapi.amap.com/v3/distance"
