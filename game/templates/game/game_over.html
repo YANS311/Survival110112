@@ -104,7 +104,7 @@
                     {% elif player.ending_type == 'SANHE_MASTER' %}
                         你在燕郊的网吧里找到了人生的终极答案。没有论文，没有导师，只有永恒的日结和永不停歇的键盘声。
                     {% elif player.ending_type == 'SAN_BREAKDOWN' %}
-                        你的理智在 {{ player.region_name }} 的某个夜晚彻底崩塌。现在你分不清代码和现实，导师的消息你再也看不到了。
+                        你的理智在 {{ player.death_location_name }} 的某个夜晚彻底崩塌。现在你分不清代码和现实，导师的消息你再也看不到了。
                     {% elif player.ending_type == 'ACADEMIC_FRAUD' %}
                         你偷偷用 4080 挖矿的行为被导师发现。学术不端的帽子扣了下来，你被遣送回籍，学术生涯就此终结。
                     {% elif player.thesis_progress > 80 %}
